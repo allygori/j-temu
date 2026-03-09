@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1773074946691,
+      "tag": "0000_tough_sauron",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773077461103,
+      "tag": "0001_new_gwen_stacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773164316899,
+      "tag": "0002_demonic_marvel_zombies",
+      "breakpoints": true
+    }
+  ]
+}

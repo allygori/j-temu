@@ -17,96 +17,67 @@ This schema should supports:
 All times should be stored in UTC.
 
 ## Tables Overview
-- users (Auth)
-- accounts (Auth)
-- sessions (Auth)
-- verifications (Auth)
-- organizations (Tenancy)
-- members (Tenancy/RBAC)
-- invitations (Tenancy)
-- event_types (Scheduling)
-- availability (Scheduling)
-- bookings (Scheduling)
-- audit_logs (Monitoring)
+- users
+- organizations
+- roles
+- user_roles
+- event_types
+- availability
+- bookings
+- audit_logs
 
 ## Entity Relationship Diagram
 
 ```mermaid
 erDiagram
-    %% Auth & Tenancy
-    users ||--o{ accounts : "has"
-    users ||--o{ sessions : "has"
-    users ||--o{ members : "is a member of"
-    users ||--o{ invitations : "sends"
-    organizations ||--o{ members : "has"
-    organizations ||--o{ invitations : "has"
+    %% Relationships (Cardinalities: || = one, o{ = many)
+    ORGANIZATIONS ||--o{ USERS : "has many"
+    ORGANIZATIONS ||--o{ ROLES : "defines"
+    ORGANIZATIONS ||--o{ EVENT_TYPES : "owns"
+    ORGANIZATIONS ||--o{ BOOKINGS : "has"
+    ORGANIZATIONS ||--o{ AUDIT_LOGS : "logs"
 
-    %% Features (Events & Bookings)
-    organizations ||--o{ event_types : "owns"
-    organizations ||--o{ bookings : "has"
-    organizations ||--o{ audit_logs : "logs"
+    USERS ||--o{ USER_ROLES : "assigned to"
+    ROLES ||--o{ USER_ROLES : "assigned to"
 
-    users ||--o{ audit_logs : "performs"
-    event_types ||--o{ availability : "has rules"
-    event_types ||--o{ bookings : "generates"
+    EVENT_TYPES ||--o{ AVAILABILITY : "has rules"
+    EVENT_TYPES ||--o{ BOOKINGS : "generates"
 
-    users {
-        text id PK
-        text name
-        text email UK
-        boolean email_verified
-        text image
-        text timezone
-        timestamp created_at
-        timestamp updated_at
-    }
-
-    organizations {
-        text id PK
+    %% Entities with key fields
+    ORGANIZATIONS {
+        uuid id PK
         text name
         text slug UK
-        text logo
         text plan
-        text metadata "JSONB for settings"
-        timestamp created_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
-    members {
-        text id PK
-        text organization_id FK
-        text user_id FK
-        text role "owner, admin, staff"
-        timestamp created_at
-        timestamp updated_at
+    USERS {
+        uuid id PK
+        uuid organization_id FK
+        text email UK
+        text password_hash
+        text full_name
+        text avatar_url
+        text timezone
+        timestamptz created_at
+        timestamptz updated_at
     }
 
-    invitations {
-        text id PK
-        text organization_id FK
-        text email
-        text role
-        text status
-        timestamp expires_at
-        text inviter_id FK
+    ROLES {
+        uuid id PK
+        uuid organization_id FK
+        text name
+        jsonb permissions
     }
 
-    accounts {
-        text id PK
-        text account_id
-        text provider_id
-        text user_id FK
-        timestamp created_at
-        timestamp updated_at
+    USER_ROLES {
+        uuid user_id PK,FK
+        uuid role_id PK,FK
     }
 
-    sessions {
-        text id PK
-        timestamp expires_at
-        text token UK
-        text user_id FK
-    }
-
-    event_types {
+    EVENT_TYPES {
         uuid id PK
         uuid organization_id FK
         uuid creator_id FK "references users"
@@ -119,11 +90,11 @@ erDiagram
         int max_bookings_per_day
         int buffer_before
         int buffer_after
-        timestamp created_at
-        timestamp updated_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
-    availability {
+    AVAILABILITY {
         uuid id PK
         uuid event_type_id FK
         int day_of_week
@@ -133,24 +104,23 @@ erDiagram
         boolean is_recurring
     }
 
-    bookings {
+    BOOKINGS {
         uuid id PK
         uuid organization_id FK
         uuid event_type_id FK
         text invitee_name
         text invitee_email
         text invitee_phone
-        timestamp start_time
-        timestamp end_time
+        timestamptz start_time
+        timestamptz end_time
         text status
         text notes
         text payment_status
-        text metadata "JSONB"
-        timestamp created_at
-        timestamp updated_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
-    audit_logs {
+    AUDIT_LOGS {
         uuid id PK
         uuid organization_id FK
         uuid user_id FK
@@ -158,7 +128,7 @@ erDiagram
         text entity_type
         uuid entity_id
         jsonb details
-        timestamp created_at
+        timestamptz created_at
     }
 ```
 
