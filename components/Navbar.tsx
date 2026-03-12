@@ -2,12 +2,20 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Rocket } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import ThemeToggle from "./ThemeToggle";
+import { authClient } from "@/lib/auth/auth-client";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleSignIn = async () => {
+    await authClient.signIn.social({
+      provider: "google",
+      callbackURL: "/onboarding",
+    });
+  };
 
   return (
     <motion.nav
@@ -42,18 +50,19 @@ export default function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
-            <a
-              href="#"
+            <button
+              onClick={handleSignIn}
               className="px-4 py-2 text-sm font-medium text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
             >
               Masuk
-            </a>
-            <a
-              href="#"
-              className="px-4 py-2 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary-hover rounded-lg transition-colors"
+            </button>
+            <button
+              onClick={handleSignIn}
+              className="px-4 py-2 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary-hover rounded-lg transition-colors flex items-center gap-2"
             >
+              <Rocket className="w-4 h-4" />
               Coba Gratis
-            </a>
+            </button>
           </div>
 
           {/* Mobile buttons */}
@@ -92,18 +101,18 @@ export default function Navbar() {
                 </a>
               ))}
               <div className="pt-4 mt-4 border-t border-border flex flex-col gap-2">
-                <a
-                  href="#"
+                <button
+                  onClick={handleSignIn}
                   className="block text-center px-4 py-2.5 text-sm font-medium text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   Masuk
-                </a>
-                <a
-                  href="#"
+                </button>
+                <button
+                  onClick={handleSignIn}
                   className="block text-center px-4 py-2.5 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary-hover rounded-lg transition-colors"
                 >
                   Coba Gratis
-                </a>
+                </button>
               </div>
             </div>
           </motion.div>

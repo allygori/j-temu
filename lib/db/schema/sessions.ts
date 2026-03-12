@@ -5,6 +5,8 @@ import { user } from "./users";
 export const session = pgTable("sessions", {
 	id: text("id").primaryKey(),
 
+	activeOrganizationId: text("active_organization_id"),
+
 	expiresAt: timestamp("expires_at").notNull(),
 
 	token: text("token").notNull().unique(),
