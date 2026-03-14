@@ -1,21 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Rocket } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import ThemeToggle from "./ThemeToggle";
-import { authClient } from "@/lib/auth/auth-client";
+// import { authClient } from "@/lib/auth/auth-client";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/onboarding",
-    });
-  };
+  // const handleSignIn = async () => {
+  //   await authClient.signIn.social({
+  //     provider: "google",
+  //     callbackURL: "/onboarding",
+  //   });
+  // };
 
   return (
     <motion.nav
@@ -50,19 +51,19 @@ export default function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
-            <button
-              onClick={handleSignIn}
+            <Link
+              href={`/login`}
               className="px-4 py-2 text-sm font-medium text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
             >
               Masuk
-            </button>
-            <button
-              onClick={handleSignIn}
+            </Link>
+            <Link
+              href={`/register`}
               className="px-4 py-2 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary-hover rounded-lg transition-colors flex items-center gap-2"
             >
               <Rocket className="w-4 h-4" />
               Coba Gratis
-            </button>
+            </Link>
           </div>
 
           {/* Mobile buttons */}
@@ -101,18 +102,18 @@ export default function Navbar() {
                 </a>
               ))}
               <div className="pt-4 mt-4 border-t border-border flex flex-col gap-2">
-                <button
-                  onClick={handleSignIn}
+                <Link
+                  href={`/login`}
                   className="block text-center px-4 py-2.5 text-sm font-medium text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   Masuk
-                </button>
-                <button
-                  onClick={handleSignIn}
+                </Link>
+                <Link
+                  href={`/register`}
                   className="block text-center px-4 py-2.5 text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary-hover rounded-lg transition-colors"
                 >
                   Coba Gratis
-                </button>
+                </Link>
               </div>
             </div>
           </motion.div>

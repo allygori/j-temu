@@ -2,33 +2,47 @@ import { auth } from "./lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function proxy(request: NextRequest) {
-    const res = await auth.api.getSession({
+    const session = await auth.api.getSession({
         headers: request.headers,
     });
 
-    const isAuthPage = request.nextUrl.pathname.startsWith("/api/auth");
-    const isOnboardingPage = request.nextUrl.pathname === "/onboarding";
-    const isPublicPage = request.nextUrl.pathname === "/" || request.nextUrl.pathname === "/favicon.ico";
+    const path = request.nextUrl.pathname;
+    const isAuthPage = path.startsWith("/api/auth");
+    const isOnboardingPage = path === "/onboarding";
+    const isPublicPage =
+        path === "/" ||
+        path === "/favicon.ico" ||
+        path === "/login" ||
+        path === "/register";
 
-    if (!res) {
-        if (!isAuthPage && !isPublicPage && !isOnboardingPage) {
-            // Redirect to home or login if not authenticated and trying to access private pages
-            return NextResponse.redirect(new URL("/", request.url));
+    if (!session) {
+        if (!isAuthPage && !isPublicPage) {
+            // Redirect to login if not authenticated and trying to access private pages
+            return NextResponse.redirect(new URL("/login", request.url));
         }
         return NextResponse.next();
     }
 
     // User is authenticated
-    const hasOrg = res.session.activeOrganizationId || (res as any).activeOrganizationId;
+    const organizations = await auth.api.listOrganizations({
+        headers: request.headers,
+    });
+    
+    const hasAnyOrg = organizations && organizations.length > 0;
 
-    if (!hasOrg && !isOnboardingPage && !isPublicPage && !isAuthPage) {
-        // Force onboarding if they have no organization
+    // 1. If user HAS organizations, they should NOT be on /onboarding
+    if (hasAnyOrg && isOnboardingPage) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+
+    // 2. If user HAS NO organizations, they MUST go to /onboarding (unless it's a public/auth page)
+    if (!hasAnyOrg && !isOnboardingPage && !isPublicPage && !isAuthPage) {
         return NextResponse.redirect(new URL("/onboarding", request.url));
     }
 
-    if (hasOrg && isOnboardingPage) {
-        // If they already have an org, don't let them go back to onboarding
-        return NextResponse.redirect(new URL("/", request.url));
+    // 3. Prevent authenticated users from visiting login/register
+    if (path === "/login" || path === "/register") {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     return NextResponse.next();
