@@ -13,7 +13,9 @@ export async function proxy(request: NextRequest) {
         path === "/" ||
         path === "/favicon.ico" ||
         path === "/login" ||
-        path === "/register";
+        path === "/register" ||
+        path === "/dashboard" || /** @todo urgent remove */
+        path === "/forgot-password";
 
     if (!session) {
         if (!isAuthPage && !isPublicPage) {
@@ -27,7 +29,7 @@ export async function proxy(request: NextRequest) {
     const organizations = await auth.api.listOrganizations({
         headers: request.headers,
     });
-    
+
     const hasAnyOrg = organizations && organizations.length > 0;
 
     // 1. If user HAS organizations, they should NOT be on /onboarding

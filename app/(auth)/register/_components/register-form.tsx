@@ -19,14 +19,14 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { Checkbox } from "@/components/ui/checkbox"
 
-export default function LoginForm({
+export default function RegisterForm({
   className,
   ...props
 }: ComponentProps<"div">) {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -37,18 +37,19 @@ export default function LoginForm({
     setError(null)
 
     try {
-      const { error: authError } = await authClient.signIn.email({
+      const { error: authError } = await authClient.signUp.email({
         email,
         password,
-        rememberMe,
+        name,
+        callbackURL: "/onboarding",
       })
 
       if (authError) {
-        setError(authError.message || "Email atau kata sandi salah.")
+        setError(authError.message || "Gagal membuat akun. Silakan coba lagi.")
         return
       }
 
-      router.push("/dashboard")
+      router.push("/onboarding")
       router.refresh()
     } catch (err) {
       setError("Terjadi kesalahan teknis. Silakan coba lagi nanti.")
@@ -57,16 +58,16 @@ export default function LoginForm({
     }
   }
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleSignUp = async () => {
     setIsLoading(true)
     setError(null)
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: "/onboarding",
       })
     } catch (err) {
-      setError("Gagal masuk dengan Google.")
+      setError("Gagal mendaftar dengan Google.")
       setIsLoading(false)
     }
   }
@@ -75,6 +76,18 @@ export default function LoginForm({
     <div className={cn("grid gap-6", className)} {...props}>
       <form onSubmit={onSubmit}>
         <FieldGroup className="gap-4">
+          <Field>
+            <FieldLabel htmlFor="name">Nama Lengkap</FieldLabel>
+            <Input
+              id="name"
+              placeholder="Masukkan nama lengkap"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={isLoading}
+              required
+            />
+          </Field>
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
@@ -88,15 +101,7 @@ export default function LoginForm({
             />
           </Field>
           <Field>
-            <div className="flex items-center justify-between mb-1">
-              <FieldLabel htmlFor="password">Kata Sandi</FieldLabel>
-              <Link
-                href="/forgot-password"
-                className="text-xs hover:underline underline-offset-4"
-              >
-                Lupa kata sandi?
-              </Link>
-            </div>
+            <FieldLabel htmlFor="password">Kata Sandi</FieldLabel>
             <div className="relative">
               <Input
                 id="password"
@@ -119,21 +124,6 @@ export default function LoginForm({
             </div>
           </Field>
 
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="remember"
-              checked={rememberMe}
-              onCheckedChange={(checked) => setRememberMe(checked === true)}
-              disabled={isLoading}
-            />
-            <label
-              htmlFor="remember"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Ingat saya
-            </label>
-          </div>
-
           {error && (
             <div className="text-destructive text-xs font-medium">
               {error}
@@ -142,7 +132,7 @@ export default function LoginForm({
 
           <Button disabled={isLoading} className="w-full">
             {isLoading && <Spinner className="mr-2" />}
-            Masuk
+            Buat Akun
           </Button>
         </FieldGroup>
       </form>
@@ -153,7 +143,7 @@ export default function LoginForm({
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-background px-2 text-muted-foreground">
-            Atau lanjutkan dengan
+            Atau daftar dengan
           </span>
         </div>
       </div>
@@ -162,7 +152,7 @@ export default function LoginForm({
         variant="outline"
         type="button"
         disabled={isLoading}
-        onClick={handleGoogleLogin}
+        onClick={handleGoogleSignUp}
         className="w-full"
       >
         {isLoading ? <Spinner className="mr-2" /> : <GoogleIcon className="mr-2 h-4 w-4" />}

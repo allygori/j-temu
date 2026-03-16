@@ -7,6 +7,9 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
+    <div className="min-h-screen">
+      {children}
+    </div>
     // <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-zinc-950 p-4 font-sans text-foreground">
     //   <div className="mb-8 flex flex-col items-center">
     //     <Link href="/" className="flex items-center gap-2 group">
@@ -18,9 +21,9 @@ export default function AuthLayout({
     //       </span>
     //     </Link>
     //   </div>
-    <div className="TITITITIT">
-      {children}
-    </div>
+
+    //   {children}
+
     //   <div className="mt-8 text-center">
     //     <p className="text-sm text-gray-500 dark:text-zinc-500">
     //       &copy; {new Date().getFullYear()} Otonomy. Semua hak dilindungi.
