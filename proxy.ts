@@ -15,6 +15,7 @@ export async function proxy(request: NextRequest) {
         path === "/login" ||
         path === "/register" ||
         path === "/dashboard" || /** @todo urgent remove */
+        path === "/dashboard-2" || /** @todo urgent remove */
         path === "/forgot-password";
 
     if (!session) {

@@ -42,5 +42,4 @@ next-env.d.ts
 
 # misc
 .trash
-build_output.txt
-build_output_*.txt
+*.txt
